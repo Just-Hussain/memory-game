@@ -69,6 +69,7 @@ function shuffleHtml() {
 
  let openCards = [];
  let movesCount = 0;
+ let starsCount = document.getElementsByClassName("fa fa-star").length;
 
 
  document.querySelector(".deck").addEventListener("click", function(event) {
@@ -77,8 +78,6 @@ function shuffleHtml() {
 
     if (parentClass == "card") {
         const childClass = event.target.children[0].className;
-        movesCount++;
-        document.querySelector(".moves").textContent = movesCount;
 
         
         if (openCards.length == 0) {
@@ -88,46 +87,53 @@ function shuffleHtml() {
             };
             openCards.push(info);
             
-            event.target.className = "card open show";
+            showCard(event);
         }
         else if (openCards.length > 0) {
             let info = {
                 child: childClass,
                 parent: event.target
             };
-
             openCards.push(info);
+            
                         
             if (openCards[0].child == openCards[1].child) {
-                openCards[0].parent.className = "card match";
-                openCards[1].parent.className = "card match";
+                matchCards(openCards);
             }
             else {
-                openCards[0].parent.className = "card";
-                openCards[1].parent.className = "card";
+                hideCards(openCards);
             }
+            updateMoves();
+            updateStars();
 
-            openCards.pop();
-            openCards.pop();
+
+            openCards.length = 0;
 
             
             
         }
 
         if (allMatch(cards)) {
-            console.log("fdfdfdfdf");
-            document.querySelector("h1").textContent = "ALL DONE!!";
+            document.querySelector("h1").textContent = "YOU WON! with " + movesCount
+             + " moves and " + starsCount + " stars! play again using the restart symbol";
         }
         
     }
  });
 
-    document.querySelector(".restart").addEventListener("click", function(event) {
+    
+ document.querySelector(".restart").addEventListener("click", function(event) {
      
     if (event.target.className == "fa fa-repeat") {
-        console.log("reee");
         shuffleHtml();
         document.querySelector(".moves").textContent = "0";
+        
+        starsCount = document.getElementsByClassName("fa fa-star").length;
+        for (let i = 0; i < starsCount; i++) {
+            document.getElementsByClassName("fa fa-star")[i].setAttribute("style", "color: black;");
+        }
+
+        document.querySelector("h1").textContent = "Matching Game";
     }
  });
 
@@ -147,4 +153,39 @@ function shuffleHtml() {
      return flag;
 
  }
+
+ function updateMoves() {
+    movesCount++;
+    document.querySelector(".moves").textContent = movesCount;
+ }
+
+ function updateStars() {
+    if (movesCount === 9) {
+         starsCount--;
+         document.getElementsByClassName("fa fa-star")[starsCount].setAttribute("style", "color: gray;");
+     }
+     else if (movesCount === 15) {
+         starsCount--;
+         document.getElementsByClassName("fa fa-star")[starsCount].setAttribute("style", "color: gray;");
+     }
+ }
  
+ function showCard(event) {
+    event.target.className = "card open show";
+ }
+
+ function matchCards(openCards) {
+    for (let i = 0; i < openCards.length; i++) {
+        openCards[i].parent.className = "card match";
+     }
+ }
+
+ function hideCards(openCards) {
+     for (let i = 0; i < openCards.length; i++) {
+        openCards[i].parent.className = "card";
+     }
+ }
+
+
+ 
+
