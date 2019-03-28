@@ -44,6 +44,7 @@ function shuffleHtml() {
         const random = Math.floor(Math.random() * i);  
         
         cards[i].children[0].className = "fa " + cardsNames[random];
+        cards[i].className = "card";
         
         cardsNames.splice(random, 1);
     }
@@ -67,6 +68,8 @@ function shuffleHtml() {
  */
 
  let openCards = [];
+ let movesCount = 0;
+
 
  document.querySelector(".deck").addEventListener("click", function(event) {
     const parentClass = event.target.className; 
@@ -74,6 +77,8 @@ function shuffleHtml() {
 
     if (parentClass == "card") {
         const childClass = event.target.children[0].className;
+        movesCount++;
+        document.querySelector(".moves").textContent = movesCount;
 
         
         if (openCards.length == 0) {
@@ -104,10 +109,42 @@ function shuffleHtml() {
 
             openCards.pop();
             openCards.pop();
+
+            
+            
         }
 
-        console.log(event.target.children[0]);
+        if (allMatch(cards)) {
+            console.log("fdfdfdfdf");
+            document.querySelector("h1").textContent = "ALL DONE!!";
+        }
         
     }
  });
+
+    document.querySelector(".restart").addEventListener("click", function(event) {
+     
+    if (event.target.className == "fa fa-repeat") {
+        console.log("reee");
+        shuffleHtml();
+        document.querySelector(".moves").textContent = "0";
+    }
+ });
+
+ function allMatch(cards) {
+     let flag =  false;
+
+     for (let i = 0; i < cards.length; i++) {
+         if (cards[i].className == "card match") {
+             flag = true;
+         }
+         else {
+             flag = false;
+             break;
+         }
+     }
+
+     return flag;
+
+ }
  
