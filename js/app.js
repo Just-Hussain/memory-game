@@ -1,37 +1,11 @@
-/*
- * Create a list that holds all of your cards
- */
 
-
+    //Data structue to hold all the cards.
 let cards = Array.from(document.getElementsByClassName("card"));
 
+initDeck();
 
-/*
- * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
- */
-
-shuffleHtml();
-
-
-// Shuffle function from http://stackoverflow.com/a/2450976
-// function shuffleArray(array) {
-//     var currentIndex = array.length, temporaryValue, randomIndex;
-
-//     while (currentIndex !== 0) {
-//         randomIndex = Math.floor(Math.random() * currentIndex);
-//         currentIndex -= 1;
-//         temporaryValue = array[currentIndex];
-//         array[currentIndex] = array[randomIndex];
-//         array[randomIndex] = temporaryValue;
-//     }
-
-//     return array;
-// }
-
-function shuffleHtml() {
+    //Randomizes html elements (cards) symbols (children). 
+function initDeck() {
     
     let cardsNames = [
         "fa-diamond", "fa-diamond", "fa-paper-plane-o", "fa-paper-plane-o",
@@ -51,107 +25,101 @@ function shuffleHtml() {
 }
 
 
-
-
-
-
-
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
- */
-
- let openCards = [];
+ let openCards = []; //To hold currently opend cards (Not matched).
  let movesCount = 0;
+    
+    //This gets the initial number of stars from HTML.
  let starsCount = document.getElementsByClassName("fa fa-star").length;
 
+    //To calculate when the player started and finished.
+ let startTime = 0;
+ let finishTime = 0;
+ let isStart = true;
 
+
+ //Listener for clicks on cards.
  document.querySelector(".deck").addEventListener("click", function(event) {
     const parentClass = event.target.className; 
-    
 
+    /*Check difentions of getInfo(), showCard(), matchCards(), 
+    hideCards(), updateMoves(), updateStars(), allMatch() below. */
     if (parentClass == "card") {
-        const childClass = event.target.children[0].className;
-
-        
-        if (openCards.length == 0) {
-            let info = {
-                child: childClass,
-                parent: event.target
-            };
-            openCards.push(info);
             
+            //Starting the timer.
+        if (isStart) {
+            startTime = performance.now();
+            isStart = false;
+        }
+
+            //Checking, comparing, clearing currenlty opened cards.
+        if (openCards.length == 0) {
+            openCards.push(getInfo(event));
             showCard(event);
         }
         else if (openCards.length > 0) {
-            let info = {
-                child: childClass,
-                parent: event.target
-            };
-            openCards.push(info);
+            openCards.push(getInfo(event));
+            showCard(event);
             
-                        
-            if (openCards[0].child == openCards[1].child) {
+            if (openCards[0].symbolName == openCards[1].symbolName) {
                 matchCards(openCards);
             }
             else {
-                hideCards(openCards);
+                setTimeout(function() {
+                    hideCards(openCards);
+                }, 1000);
             }
             updateMoves();
-            updateStars();
-
-
-            openCards.length = 0;
-
-            
-            
+            updateStars();     
         }
 
-        if (allMatch(cards)) {
-            document.querySelector("h1").textContent = "YOU WON! with " + movesCount
-             + " moves and " + starsCount + " stars! play again using the restart symbol";
+        if (allMatch(cards)) {  
+            finishTime = performance.now();
+            const playTime = Math.floor((finishTime - startTime) / 1000);
+
+            document.querySelector("h1").textContent = `YOU WON! with ${movesCount} moves and ${starsCount} stars in ${playTime} seconds! play again using the restart symbol!`;        
         }
         
     }
  });
 
-    
+
+    //Listener for the restart button.
  document.querySelector(".restart").addEventListener("click", function(event) {
      
+    //Check setStarColor difention below.
+
+        //Checks and resets everything.
     if (event.target.className == "fa fa-repeat") {
-        shuffleHtml();
-        document.querySelector(".moves").textContent = "0";
+        initDeck();
+        isStart = true;
+        openCards.length = 0;
+
+        movesCount = 0;
+        document.querySelector(".moves").textContent = movesCount;
         
         starsCount = document.getElementsByClassName("fa fa-star").length;
         for (let i = 0; i < starsCount; i++) {
-            document.getElementsByClassName("fa fa-star")[i].setAttribute("style", "color: black;");
+            setStarColor(i, "black");
         }
 
         document.querySelector("h1").textContent = "Matching Game";
     }
  });
 
+    //Comapers cards to check if the game is done using "match" class.
  function allMatch(cards) {
-     let flag =  false;
+    let flag =  false;
 
-     for (let i = 0; i < cards.length; i++) {
-         if (cards[i].className == "card match") {
-             flag = true;
-         }
-         else {
-             flag = false;
-             break;
-         }
-     }
-
-     return flag;
-
+    for (let i = 0; i < cards.length; i++) {
+        if (cards[i].className == "card match") {
+            flag = true;
+        }
+        else {
+            flag = false;
+            break;
+        }
+    }
+    return flag;
  }
 
  function updateMoves() {
@@ -160,32 +128,44 @@ function shuffleHtml() {
  }
 
  function updateStars() {
-    if (movesCount === 9) {
-         starsCount--;
-         document.getElementsByClassName("fa fa-star")[starsCount].setAttribute("style", "color: gray;");
-     }
-     else if (movesCount === 15) {
-         starsCount--;
-         document.getElementsByClassName("fa fa-star")[starsCount].setAttribute("style", "color: gray;");
-     }
+    if (movesCount === 9 || movesCount === 15) {
+        starsCount--;
+        setStarColor(starsCount, "gray")
+    }
  }
- 
+
+    //Simplfies changing a star`s color.
+ function setStarColor(pos, color) {
+    document.getElementsByClassName("fa fa-star")[pos].setAttribute("style", `color: ${color};`);
+     
+ }
+
+    //Showig. matching and hiding all using class names.
  function showCard(event) {
     event.target.className = "card open show";
  }
 
  function matchCards(openCards) {
     for (let i = 0; i < openCards.length; i++) {
-        openCards[i].parent.className = "card match";
+        openCards[i].card.className = "card match";
      }
- }
+     openCards.length = 0;
+    }
 
  function hideCards(openCards) {
      for (let i = 0; i < openCards.length; i++) {
-        openCards[i].parent.className = "card";
+        openCards[i].card.className = "card";
      }
+     openCards.length = 0;
  }
 
-
+    //To encapsulate the informaion of the event on click and store in the opendCards array.
+function getInfo(event) {
+    let info = {
+        symbolName: event.target.children[0].className,
+        card: event.target
+    };
+    return info;
+}
  
 
