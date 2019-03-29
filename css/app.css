@@ -21,6 +21,9 @@ body {
     font-family: 'Coda', cursive;
 }
 
+span {
+    margin-left: 2em;
+}
 .container {
     display: flex;
     justify-content: center;

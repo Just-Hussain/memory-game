@@ -35,6 +35,8 @@ function initDeck() {
  let startTime = 0;
  let finishTime = 0;
  let isStart = true;
+ let playTime = 0;
+ let timerKey;
 
 
  //Listener for clicks on cards.
@@ -47,9 +49,15 @@ function initDeck() {
             
             //Starting the timer.
         if (isStart) {
-            startTime = performance.now();
+            timerKey = setInterval(function() {
+                playTime++;
+                document.querySelector(".time").textContent = playTime;
+    
+            }, 1000);
             isStart = false;
         }
+
+        
 
             //Checking, comparing, clearing currenlty opened cards.
         if (openCards.length == 0) {
@@ -72,11 +80,12 @@ function initDeck() {
             updateStars();     
         }
 
-        if (allMatch(cards)) {  
-            finishTime = performance.now();
-            const playTime = Math.floor((finishTime - startTime) / 1000);
+        if (allMatch(cards)) {
 
-            document.querySelector("h1").textContent = `YOU WON! with ${movesCount} moves and ${starsCount} stars in ${playTime} seconds! play again using the restart symbol!`;        
+            clearInterval(timerKey);
+
+            document.querySelector("#win-modal").
+            document.querySelector("h1").textContent = `YOU WON! with ${movesCount} moves and ${starsCount} stars in ${playTime} seconds! play again using the restart symbol!`;
         }
         
     }
