@@ -81,11 +81,10 @@ function initDeck() {
         }
 
         if (allMatch(cards)) {
-
             clearInterval(timerKey);
-
-            document.querySelector("#win-modal").
-            document.querySelector("h1").textContent = `YOU WON! with ${movesCount} moves and ${starsCount} stars in ${playTime} seconds! play again using the restart symbol!`;
+            if (confirm(`YOU WON! with ${movesCount} moves and ${starsCount} stars in ${playTime} seconds! play again by cliking OK!`)) {
+                restart();
+              }
         }
         
     }
@@ -99,21 +98,26 @@ function initDeck() {
 
         //Checks and resets everything.
     if (event.target.className == "fa fa-repeat") {
-        initDeck();
-        isStart = true;
-        openCards.length = 0;
-
-        movesCount = 0;
-        document.querySelector(".moves").textContent = movesCount;
+        restart();
         
-        starsCount = document.getElementsByClassName("fa fa-star").length;
-        for (let i = 0; i < starsCount; i++) {
-            setStarColor(i, "black");
-        }
-
-        document.querySelector("h1").textContent = "Matching Game";
     }
  });
+
+ function restart() {
+    initDeck();
+    isStart = true;
+    playTime = 0;
+    document.querySelector(".time").textContent = playTime;
+    openCards.length = 0;
+
+    movesCount = 0;
+    document.querySelector(".moves").textContent = movesCount;
+    
+    starsCount = document.getElementsByClassName("fa fa-star").length;
+    for (let i = 0; i < starsCount; i++) {
+        setStarColor(i, "black");
+    }
+ }
 
     //Comapers cards to check if the game is done using "match" class.
  function allMatch(cards) {
